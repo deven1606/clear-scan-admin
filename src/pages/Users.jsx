@@ -10,6 +10,15 @@ import {
   Grid,
   Card,
   CardContent,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  TablePagination,
+  Checkbox,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -17,12 +26,14 @@ import {
   Delete as DeleteIcon,
   Search as SearchIcon,
 } from '@mui/icons-material';
-import { DataGrid } from '@mui/x-data-grid';
 import { useNavigate } from 'react-router-dom';
 
 const Users = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [selected, setSelected] = useState([]);
   const [users, setUsers] = useState([
     {
       id: 1,
@@ -74,6 +85,7 @@ const Users = () => {
 
   const handleDelete = (id) => {
     setUsers(users.filter(user => user.id !== id));
+    setSelected(selected.filter(selectedId => selectedId !== id));
   };
 
   const handleEdit = (id) => {
@@ -83,6 +95,46 @@ const Users = () => {
   const handleAddUser = () => {
     navigate('/users/add');
   };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const handleSelectAllClick = (event) => {
+    if (event.target.checked) {
+      const newSelected = filteredUsers.map((user) => user.id);
+      setSelected(newSelected);
+      return;
+    }
+    setSelected([]);
+  };
+
+  const handleClick = (event, id) => {
+    const selectedIndex = selected.indexOf(id);
+    let newSelected = [];
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, id);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selected.slice(1));
+    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selected.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1),
+      );
+    }
+
+    setSelected(newSelected);
+  };
+
+  const isSelected = (id) => selected.indexOf(id) !== -1;
 
   const getStatusColor = (status) => {
     return status === 'Active' ? 'success' : 'error';
@@ -96,81 +148,6 @@ const Users = () => {
       default: return 'default';
     }
   };
-
-  const columns = [
-    {
-      field: 'avatar',
-      headerName: 'Avatar',
-      width: 80,
-      renderCell: (params) => (
-        <Avatar sx={{ bgcolor: 'primary.main' }}>
-          {params.value}
-        </Avatar>
-      ),
-    },
-    {
-      field: 'name',
-      headerName: 'Name',
-      width: 150,
-    },
-    {
-      field: 'email',
-      headerName: 'Email',
-      width: 200,
-    },
-    {
-      field: 'role',
-      headerName: 'Role',
-      width: 120,
-      renderCell: (params) => (
-        <Chip
-          label={params.value}
-          color={getRoleColor(params.value)}
-          size="small"
-        />
-      ),
-    },
-    {
-      field: 'status',
-      headerName: 'Status',
-      width: 120,
-      renderCell: (params) => (
-        <Chip
-          label={params.value}
-          color={getStatusColor(params.value)}
-          size="small"
-        />
-      ),
-    },
-    {
-      field: 'joinDate',
-      headerName: 'Join Date',
-      width: 120,
-    },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      width: 120,
-      renderCell: (params) => (
-        <Box>
-          <IconButton
-            color="primary"
-            onClick={() => handleEdit(params.row.id)}
-            size="small"
-          >
-            <EditIcon />
-          </IconButton>
-          <IconButton
-            color="error"
-            onClick={() => handleDelete(params.row.id)}
-            size="small"
-          >
-            <DeleteIcon />
-          </IconButton>
-        </Box>
-      ),
-    },
-  ];
 
   const filteredUsers = users.filter(user =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -259,16 +236,108 @@ const Users = () => {
         />
       </Box>
 
-      <Box sx={{ height: 400, width: '100%' }}>
-        <DataGrid
-          rows={filteredUsers}
-          columns={columns}
-          pageSize={5}
+      <TableContainer component={Paper} sx={{ mt: 2 }}>
+        <Table sx={{ minWidth: 750 }}>
+          <TableHead>
+            <TableRow>
+              <TableCell padding="checkbox">
+                <Checkbox
+                  color="primary"
+                  indeterminate={selected.length > 0 && selected.length < filteredUsers.length}
+                  checked={filteredUsers.length > 0 && selected.length === filteredUsers.length}
+                  onChange={handleSelectAllClick}
+                />
+              </TableCell>
+              <TableCell>Avatar</TableCell>
+              <TableCell>Name</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Role</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell>Join Date</TableCell>
+              <TableCell>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {filteredUsers
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((user) => {
+                const isItemSelected = isSelected(user.id);
+                return (
+                  <TableRow
+                    hover
+                    onClick={(event) => handleClick(event, user.id)}
+                    role="checkbox"
+                    aria-checked={isItemSelected}
+                    tabIndex={-1}
+                    key={user.id}
+                    selected={isItemSelected}
+                    sx={{ cursor: 'pointer' }}
+                  >
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        color="primary"
+                        checked={isItemSelected}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Avatar sx={{ bgcolor: 'primary.main' }}>
+                        {user.avatar}
+                      </Avatar>
+                    </TableCell>
+                    <TableCell>{user.name}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={user.role}
+                        color={getRoleColor(user.role)}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={user.status}
+                        color={getStatusColor(user.status)}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>{user.joinDate}</TableCell>
+                    <TableCell>
+                      <IconButton
+                        color="primary"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEdit(user.id);
+                        }}
+                        size="small"
+                      >
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton
+                        color="error"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(user.id);
+                        }}
+                        size="small"
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+          </TableBody>
+        </Table>
+        <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
-          checkboxSelection
-          disableSelectionOnClick
+          component="div"
+          count={filteredUsers.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
         />
-      </Box>
+      </TableContainer>
     </Box>
   );
 };

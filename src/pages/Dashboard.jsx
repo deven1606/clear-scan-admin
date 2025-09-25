@@ -29,6 +29,8 @@ import {
   ArrowUpward,
   ArrowDownward,
   TrendingDown,
+  CalendarToday,
+  Inventory,
 } from '@mui/icons-material';
 
 const StatCard = ({ title, value, icon, color, trend, index }) => (
@@ -232,32 +234,46 @@ const RecentActivity = () => {
 const Dashboard = () => {
   const stats = [
     {
-      title: 'Total Users',
+      title: 'Total Bookings',
       value: '1,234',
-      icon: <People sx={{ fontSize: 28, color: '#6366f1' }} />,
+      icon: <Assignment sx={{ fontSize: 28, color: '#6366f1' }} />,
       color: '#6366f1',
       trend: '+12%',
     },
     {
-      title: 'MRI Services',
-      value: '15',
-      icon: <MedicalServices sx={{ fontSize: 28, color: '#10b981' }} />,
-      color: '#10b981',
+      title: 'Pending Requests',
+      value: '23',
+      icon: <CalendarToday sx={{ fontSize: 28, color: '#f59e0b' }} />,
+      color: '#f59e0b',
       trend: '+8%',
     },
     {
-      title: 'Revenue',
-      value: '$12,345',
-      icon: <AttachMoney sx={{ fontSize: 28, color: '#f59e0b' }} />,
-      color: '#f59e0b',
+      title: 'Completed Scans',
+      value: '1,156',
+      icon: <MedicalServices sx={{ fontSize: 28, color: '#10b981' }} />,
+      color: '#10b981',
       trend: '+15%',
     },
     {
-      title: 'Appointments',
-      value: '89',
-      icon: <Assignment sx={{ fontSize: 28, color: '#ec4899' }} />,
+      title: 'Revenue',
+      value: '$45,678',
+      icon: <AttachMoney sx={{ fontSize: 28, color: '#ec4899' }} />,
       color: '#ec4899',
-      trend: '+5%',
+      trend: '+18%',
+    },
+    {
+      title: 'Active Users',
+      value: '892',
+      icon: <People sx={{ fontSize: 28, color: '#8b5cf6' }} />,
+      color: '#8b5cf6',
+      trend: '+7%',
+    },
+    {
+      title: 'MRI Services',
+      value: '15',
+      icon: <Inventory sx={{ fontSize: 28, color: '#06b6d4' }} />,
+      color: '#06b6d4',
+      trend: '+3%',
     },
   ];
 
@@ -276,7 +292,7 @@ const Dashboard = () => {
       
       <Grid container spacing={3} sx={{ mb: 4 }}>
         {stats.map((stat, index) => (
-          <Grid item xs={12} sm={6} md={3} key={index}>
+          <Grid item xs={12} sm={6} md={4} lg={2} key={index}>
             <StatCard {...stat} index={index} />
           </Grid>
         ))}

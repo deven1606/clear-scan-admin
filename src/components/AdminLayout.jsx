@@ -18,6 +18,7 @@ import {
   Menu,
   MenuItem,
   Divider,
+  Collapse,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -27,20 +28,122 @@ import {
   Settings as SettingsIcon,
   AccountCircle,
   Logout,
+  ExpandLess,
+  ExpandMore,
+  CalendarToday,
+  Assignment,
+  LocalOffer,
+  Upload,
+  Description,
+  Schedule,
+  Assessment,
+  ContentCopy,
+  Search,
 } from '@mui/icons-material';
 
-const drawerWidth = 240;
+const drawerWidth = 280;
 
 const menuItems = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-  { text: 'Users', icon: <PeopleIcon />, path: '/users' },
-  { text: 'MRI Services', icon: <InventoryIcon />, path: '/mri-services' },
+  { 
+    text: 'Bookings Management', 
+    icon: <CalendarToday />, 
+    path: '/bookings',
+    subItems: [
+      { text: 'All Bookings', path: '/bookings' },
+      { text: 'Pending Requests', path: '/bookings/pending' },
+      { text: 'Approved Bookings', path: '/bookings/approved' },
+      { text: 'Cancelled Bookings', path: '/bookings/cancelled' },
+    ]
+  },
+  { 
+    text: 'User Management', 
+    icon: <PeopleIcon />, 
+    path: '/users',
+    subItems: [
+      { text: 'All Users', path: '/users' },
+      { text: 'Add User', path: '/users/add' },
+      { text: 'Patient Data', path: '/users/patients' },
+    ]
+  },
+  { 
+    text: 'Service Management', 
+    icon: <InventoryIcon />, 
+    path: '/mri-services',
+    subItems: [
+      { text: 'All Services', path: '/mri-services' },
+      { text: 'Add Service', path: '/mri-services/add' },
+      { text: 'Service Categories', path: '/mri-services/categories' },
+    ]
+  },
+  { 
+    text: 'Slot Management', 
+    icon: <Schedule />, 
+    path: '/slots',
+    subItems: [
+      { text: 'Available Slots', path: '/slots' },
+      { text: 'Working Hours', path: '/slots/hours' },
+      { text: 'Holidays', path: '/slots/holidays' },
+    ]
+  },
+  { 
+    text: 'Promo Codes', 
+    icon: <LocalOffer />, 
+    path: '/promo-codes',
+    subItems: [
+      { text: 'All Promo Codes', path: '/promo-codes' },
+      { text: 'Create Promo Code', path: '/promo-codes/create' },
+      { text: 'Usage Analytics', path: '/promo-codes/analytics' },
+    ]
+  },
+  { 
+    text: 'Reports & Delivery', 
+    icon: <Upload />, 
+    path: '/reports',
+    subItems: [
+      { text: 'Upload Reports', path: '/reports/upload' },
+      { text: 'Sent Reports', path: '/reports/sent' },
+      { text: 'Email Templates', path: '/reports/templates' },
+    ]
+  },
+  { 
+    text: 'Content Management', 
+    icon: <Description />, 
+    path: '/content',
+    subItems: [
+      { text: 'Home Page', path: '/content/home' },
+      { text: 'About Page', path: '/content/about' },
+      { text: 'Contact Page', path: '/content/contact' },
+      { text: 'Policies', path: '/content/policies' },
+    ]
+  },
+  { 
+    text: 'SEO Management', 
+    icon: <Search />, 
+    path: '/seo',
+    subItems: [
+      { text: 'Meta Tags', path: '/seo/meta' },
+      { text: 'Google Search Console', path: '/seo/console' },
+      { text: 'Sitemap', path: '/seo/sitemap' },
+    ]
+  },
+  { 
+    text: 'Statistics & Export', 
+    icon: <Assessment />, 
+    path: '/statistics',
+    subItems: [
+      { text: 'Monthly Reports', path: '/statistics/monthly' },
+      { text: 'Export Data', path: '/statistics/export' },
+      { text: 'Analytics', path: '/statistics/analytics' },
+    ]
+  },
   { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
 ];
 
 function AdminLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [expandedItems, setExpandedItems] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
   const { logout } = useAuth();
@@ -63,6 +166,120 @@ function AdminLayout() {
     navigate('/login');
   };
 
+  const handleExpandClick = (itemText) => {
+    setExpandedItems(prev => ({
+      ...prev,
+      [itemText]: !prev[itemText]
+    }));
+  };
+
+  const isItemActive = (item) => {
+    if (item.subItems) {
+      return item.subItems.some(subItem => location.pathname === subItem.path);
+    }
+    return location.pathname === item.path;
+  };
+
+  const renderMenuItem = (item, level = 0) => {
+    const hasSubItems = item.subItems && item.subItems.length > 0;
+    const isExpanded = expandedItems[item.text];
+    const isActive = isItemActive(item);
+
+    return (
+      <React.Fragment key={item.text}>
+        <ListItem disablePadding sx={{ mb: 0.5 }}>
+          <ListItemButton
+            selected={isActive}
+            onClick={() => {
+              if (hasSubItems) {
+                handleExpandClick(item.text);
+              } else {
+                navigate(item.path);
+              }
+            }}
+            sx={{
+              borderRadius: 2,
+              mb: 0.5,
+              pl: level * 2 + 2,
+              '&.Mui-selected': {
+                background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1))',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(236, 72, 153, 0.15))',
+                },
+                '& .MuiListItemIcon-root': {
+                  color: 'primary.main',
+                },
+                '& .MuiListItemText-primary': {
+                  color: 'primary.main',
+                  fontWeight: 600,
+                },
+              },
+              '&:hover': {
+                background: 'rgba(99, 102, 241, 0.05)',
+                borderRadius: 2,
+              },
+            }}
+          >
+            <ListItemIcon sx={{ minWidth: 40 }}>
+              {item.icon}
+            </ListItemIcon>
+            <ListItemText 
+              primary={item.text} 
+              primaryTypographyProps={{
+                fontWeight: isActive ? 600 : 500,
+                fontSize: level > 0 ? '0.875rem' : '0.9rem',
+              }}
+            />
+            {hasSubItems && (
+              isExpanded ? <ExpandLess /> : <ExpandMore />
+            )}
+          </ListItemButton>
+        </ListItem>
+        {hasSubItems && (
+          <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              {item.subItems.map((subItem) => (
+                <ListItem key={subItem.text} disablePadding sx={{ mb: 0.5 }}>
+                  <ListItemButton
+                    selected={location.pathname === subItem.path}
+                    onClick={() => navigate(subItem.path)}
+                    sx={{
+                      borderRadius: 2,
+                      mb: 0.5,
+                      pl: level * 2 + 4,
+                      '&.Mui-selected': {
+                        background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1))',
+                        '&:hover': {
+                          background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(236, 72, 153, 0.15))',
+                        },
+                        '& .MuiListItemText-primary': {
+                          color: 'primary.main',
+                          fontWeight: 600,
+                        },
+                      },
+                      '&:hover': {
+                        background: 'rgba(99, 102, 241, 0.05)',
+                        borderRadius: 2,
+                      },
+                    }}
+                  >
+                    <ListItemText 
+                      primary={subItem.text} 
+                      primaryTypographyProps={{
+                        fontWeight: location.pathname === subItem.path ? 600 : 500,
+                        fontSize: '0.875rem',
+                      }}
+                    />
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
+          </Collapse>
+        )}
+      </React.Fragment>
+    );
+  };
+
   const drawer = (
     <div>
       <Toolbar>
@@ -78,54 +295,16 @@ function AdminLayout() {
               justifyContent: 'center',
             }}
           >
-            <AdminPanelSettings sx={{ color: 'white', fontSize: 24 }} />
+            <Assignment sx={{ color: 'white', fontSize: 24 }} />
           </Box>
           <Typography variant="h6" noWrap component="div" fontWeight="bold">
-            Modern Admin
+            Clear Scan Admin
           </Typography>
         </Box>
       </Toolbar>
       <Divider />
       <List sx={{ px: 2 }}>
-        {menuItems.map((item) => (
-          <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
-            <ListItemButton
-              selected={location.pathname === item.path}
-              onClick={() => navigate(item.path)}
-              sx={{
-                borderRadius: 2,
-                mb: 0.5,
-                '&.Mui-selected': {
-                  background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1))',
-                  '&:hover': {
-                    background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(236, 72, 153, 0.15))',
-                  },
-                  '& .MuiListItemIcon-root': {
-                    color: 'primary.main',
-                  },
-                  '& .MuiListItemText-primary': {
-                    color: 'primary.main',
-                    fontWeight: 600,
-                  },
-                },
-                '&:hover': {
-                  background: 'rgba(99, 102, 241, 0.05)',
-                  borderRadius: 2,
-                },
-              }}
-            >
-              <ListItemIcon sx={{ minWidth: 40 }}>
-                {item.icon}
-              </ListItemIcon>
-              <ListItemText 
-                primary={item.text} 
-                primaryTypographyProps={{
-                  fontWeight: location.pathname === item.path ? 600 : 500,
-                }}
-              />
-            </ListItemButton>
-          </ListItem>
-        ))}
+        {menuItems.map((item) => renderMenuItem(item))}
       </List>
     </div>
   );
@@ -156,7 +335,10 @@ function AdminLayout() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }} fontWeight="bold">
-            {menuItems.find(item => item.path === location.pathname)?.text || 'Dashboard'}
+            {menuItems.find(item => 
+              item.path === location.pathname || 
+              (item.subItems && item.subItems.some(subItem => subItem.path === location.pathname))
+            )?.text || 'Dashboard'}
           </Typography>
           <IconButton
             size="large"

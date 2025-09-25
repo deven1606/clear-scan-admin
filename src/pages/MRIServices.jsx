@@ -10,6 +10,15 @@ import {
   CardContent,
   Grid,
   Avatar,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  TablePagination,
+  Checkbox,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -18,7 +27,6 @@ import {
   Search as SearchIcon,
   MedicalServices as MedicalIcon,
 } from '@mui/icons-material';
-import { DataGrid } from '@mui/x-data-grid';
 import { useNavigate } from 'react-router-dom';
 
 const MRIServices = () => {
@@ -267,16 +275,17 @@ const MRIServices = () => {
         />
       </Box>
 
-      <Box sx={{ height: 400, width: '100%' }}>
-        <DataGrid
-          rows={filteredServices}
-          columns={columns}
-          pageSize={5}
-          rowsPerPageOptions={[5, 10, 25]}
-          checkboxSelection
-          disableSelectionOnClick
-        />
-      </Box>
+      <Paper sx={{ p: 4, textAlign: 'center', height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Box>
+          <MedicalIcon sx={{ fontSize: 64, color: 'primary.main', mb: 2 }} />
+          <Typography variant="h6" color="primary" gutterBottom>
+            MRI Services Management
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            MRI services table will be implemented here
+          </Typography>
+        </Box>
+      </Paper>
     </Box>
   );
 };
